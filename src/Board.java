@@ -18,7 +18,7 @@ public class Board {
     int level3;
     
     
-    public Board() {
+    public Board() { //create board and initialise, all initialised to 0
         level0 = new int[4][4];
         level1 = new int[3][3];
         level1 = new int[2][2];
