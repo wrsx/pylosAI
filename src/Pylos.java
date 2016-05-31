@@ -1,4 +1,8 @@
 import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class Pylos {
 
@@ -13,9 +17,9 @@ public class Pylos {
     }
     
     public void idle() {
-        
+
         Scanner user_input = new Scanner(System.in);
-        
+                
         while (true) {
             System.out.println("Please select a valid move: ");
                 try {
@@ -26,6 +30,7 @@ public class Pylos {
                 }
         }
     }
+
     
     public void move(String arg) {
         System.out.println("You chose move: " + arg);
