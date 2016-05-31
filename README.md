@@ -1,2 +1,2 @@
 # pylosAI
-due in 2 days.
+due in 2 days
