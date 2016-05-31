@@ -22,6 +22,10 @@ public class Pylos {
  
     public void idle() {     
         while (true) {
+            if(currentPlayer > 0) {
+                System.out.println("\nWhite's turn!");
+            } else System.out.println("\nBlack's turn!");
+                    
             System.out.println("Please enter an action: ");
                 try {            
                     if(move(user_input.next(), gameBoard, currentPlayer)) {
@@ -47,7 +51,7 @@ public class Pylos {
                 remove(b, p);
                 break;
             default:
-                System.out.println("Not a valid action! Valid actions are: place, promote and remove");  
+                System.out.println("Not a valid action!\nValid actions are: place, promote and remove");  
                 return false;
         }
         return true;
