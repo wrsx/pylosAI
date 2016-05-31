@@ -47,7 +47,7 @@ public class Pylos {
                 remove(b, p);
                 break;
             default:
-                System.out.println("Not a valid move!");  
+                System.out.println("Not a valid action! Valid actions are: place, promote and remove");  
                 return false;
         }
         return true;
@@ -77,6 +77,11 @@ public class Pylos {
                     System.out.println("Move is not valid.");    
                     result = false;
                 }
+                System.out.println("Please enter a valid board coordinate:");
+                System.out.println(" -The bottom tier is squares [a,b,c,d][1-4]");
+                System.out.println(" -The second tier up is squares [e,f,g][1-3]");
+                System.out.println(" -The third tier up is squares [h,i][1-2]");
+                System.out.println(" -The top tier is square j1");
         }
         System.out.println("Succesfully places sphere at coordinates: " + c);
     }
@@ -91,7 +96,17 @@ public class Pylos {
     
     //checks if the entered coordinate is an actual coordinate
     private boolean validCoordinate(String coordinate) {
-        return true;
+        if(coordinate.length() == 2) 
+            if("abcd".contains(coordinate.substring(0, 1))) {
+                return "1234".contains(coordinate.substring(1, 2));
+            } else if("efg".contains(coordinate.substring(0, 1))) {
+                return "123".contains(coordinate.substring(1, 2));
+            } else if("hi".contains(coordinate.substring(0, 1))) {
+                return "12".contains(coordinate.substring(1, 2));
+            } else if("j".equals(coordinate.substring(0, 1))) {
+                return "1".equals(coordinate.substring(1,2));
+        }
+        return false;
     }
 
     //checks if the entered coordinate is an actual coordinate
