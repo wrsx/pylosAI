@@ -4,6 +4,11 @@ public class Pylos {
 
     public int whiteSpheres;
     public int blackSpheres;
+    public String[] base;
+    public String[] level1;
+    public String[] level2;
+    public String[] level3;
+    
     
     public Pylos() {
         whiteSpheres = 15;
