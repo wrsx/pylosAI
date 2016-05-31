@@ -4,15 +4,12 @@ public class Pylos {
 
     public int whiteSpheres;
     public int blackSpheres;
-    public String[] base;
-    public String[] level1;
-    public String[] level2;
-    public String[] level3;
-    
+    public Board gameBoard;
     
     public Pylos() {
         whiteSpheres = 15;
         blackSpheres = 15;
+        gameBoard = new Board();
     }
     
     public void idle() {
