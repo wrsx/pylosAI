@@ -35,6 +35,21 @@ public class Board extends JFrame {
         whiteSpheres = 15;
         blackSpheres = 15;        
     }
+    
+    //returns the 2D array from the board for that level
+    public int[][] getLevelTable(int level) {
+        switch(level) {
+            case 0 :
+                return level0;
+            case 1 :
+                return level1;
+            case 2 :
+                return level2;
+            case 3 :
+                return level3;
+        }
+        return null;
+    }       
 
     private void paintLevel(Graphics g, int size, int offset, int[][] level) {
         
