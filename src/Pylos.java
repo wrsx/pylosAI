@@ -116,20 +116,7 @@ public class Pylos {
         }
         return result;
         
-    }
-        //move.execute
-        
-        //if(validCoordinate(nc) && validCoordinate(oc)) {
-        //(move.isSpecial, do the delet
-        //adjust the number of spheres
-        /*
-                        if(player > 0) {
-                    gameBoard.whiteSpheres += -1;
-                } else  gameBoard.blackSpheres += -1;  
-        gameBoard.repaint();
-        */
-    
-    
+    }      
 
     public static void main(String[] args) {
         Pylos game = new Pylos();
