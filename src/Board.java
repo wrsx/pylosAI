@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JFrame;
 
 /*
@@ -17,13 +18,15 @@ import javax.swing.JFrame;
  */
 public class Board extends JFrame {
     
-    int[][] level0;
-    int[][] level1;
-    int[][] level2;
-    int[][] level3;
+    public int[][] level0;
+    public int[][] level1;
+    public int[][] level2;
+    public int[][] level3;
     
-    int whiteSpheres;
-    int blackSpheres;
+    public int whiteSpheres;
+    public int blackSpheres;
+    
+    public String lastmove = "";
     
     
     public Board() { //create board and initialise, all initialised to 0
@@ -35,6 +38,19 @@ public class Board extends JFrame {
         whiteSpheres = 15;
         blackSpheres = 15;        
     }
+    
+    //Copy constructor
+    public Board(Board another) {
+        this();
+        for(int i = 0; i < another.level0.length; i++) level0[i] = Arrays.copyOf(another.level0[i], another.level0[i].length);
+        for(int i = 0; i < another.level1.length; i++) level1[i] = Arrays.copyOf(another.level1[i], another.level1[i].length);
+        for(int i = 0; i < another.level2.length; i++) level2[i] = Arrays.copyOf(another.level2[i], another.level2[i].length);
+        for(int i = 0; i < another.level3.length; i++) level3[i] = Arrays.copyOf(another.level3[i], another.level3[i].length);
+        
+        this.whiteSpheres = another.whiteSpheres;
+        this.blackSpheres = another.blackSpheres;
+        this.lastmove = another.lastmove;
+  }    
     
     //returns the 2D array from the board for that level
     public int[][] getLevelTable(int level) {
@@ -49,7 +65,11 @@ public class Board extends JFrame {
                 return level3;
         }
         return null;
-    }       
+    }
+    
+    public boolean gameFinished() {
+        return !(whiteSpheres > 0 && blackSpheres > 0 && level3[0][0] == 0);
+    }
 
     private void paintLevel(Graphics g, int size, int offset, int[][] level) {
         
@@ -144,6 +164,10 @@ public class Board extends JFrame {
         g.setColor(Color.BLACK);
         g.fillOval(1330, 470, 100, 100); 
         g.drawOval(1330, 350, 100, 100); 
+        
+        ///////
+        g.drawString(lastmove, 550, 500);
+        ///////
         
         g.drawString(Integer.toString(whiteSpheres), 1364, 415);
         g.setColor(Color.WHITE);

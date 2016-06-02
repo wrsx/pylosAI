@@ -26,51 +26,65 @@ public class Move {
         newCoordinate = nc;
         oldCoordinate = oc;
     }
+    
+    void test() {
+        if(newCoordinate != null && oldCoordinate == null) {
+            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + newCoordinate.value;
+        } else if(newCoordinate == null && oldCoordinate != null) {
+            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + oldCoordinate.value;
+        } else if(newCoordinate != null && oldCoordinate != null) {
+            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + oldCoordinate.value + " " + newCoordinate.value;
+        }
+    }
         
     public boolean execute() {
         switch(this.action) {
             case PLACE :
+                test();
                 return place(this);
             case PROMOTE : 
+                test();
                 return promote(this);
             case REMOVE :
+                test();
                 return remove(this);
         }
         return false;        
     }
 
     private static boolean place(Move m) {      
-        if(checkValidMove(m)) {
+        try {
             setSquare(m.gameBoard, m.newCoordinate, m.player);
             System.out.println("Succesfully placed sphere at coordinates: " + m.newCoordinate.value);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     private static boolean promote(Move m) {    
-        if(checkValidMove(m)) {
+        try {
             setSquare(m.gameBoard, m.newCoordinate, m.player);
             setSquare(m.gameBoard, m.oldCoordinate, 0);
             System.out.println("Succesfully promoted sphere from coordinates: " + m.oldCoordinate.value + " to coordinates: " + m.newCoordinate.value);
             return true;
-        } 
-        return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
     
     private static boolean remove(Move m) {     
-        if(checkValidMove(m)) {
+        try {
             setSquare(m.gameBoard, m.oldCoordinate, 0); 
             System.out.println("Succesfully removed sphere from coordinates: " + m.oldCoordinate.value);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
-    
-
 
     //checks if the entered coordinate is an actual coordinate
-    private static boolean checkValidMove(Move m) {
+    public static boolean checkValidMove(Move m) {
         boolean valid = false;
         if(m.newCoordinate != null) {
             //Promotion move, first we check whether the new level is greater than the old one

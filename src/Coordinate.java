@@ -12,30 +12,33 @@ public class Coordinate {
     
     public int firstIndex;
     public int secondIndex;
-    public int level;
+    public int level;   
     public String value;
     public Board gameBoard;
     
     Coordinate(String coordinate, Board board) {
         gameBoard = board;
         value = coordinate;
-        firstIndex = letterToIndex(coordinate);
-        secondIndex = Integer.parseInt(coordinate.substring(1, 2))-1;
-        level = getLevel(coordinate);     
+        try {
+            firstIndex = letterToIndex(coordinate);
+            secondIndex = Integer.parseInt(coordinate.substring(1, 2))-1;
+            level = getLevel(coordinate); 
+        } catch(Exception e) {
+        }
     }
     
     //checks if the entered coordinate is an actual coordinate
-    private static boolean validCoordinate(String coordinate) {
+    public boolean isValid() {
         boolean valid = false;
-        if(coordinate.length() == 2) 
-            if("abcd".contains(coordinate.substring(0, 1))) {
-                valid = "1234".contains(coordinate.substring(1, 2));
-            } else if("efg".contains(coordinate.substring(0, 1))) {
-                valid = "123".contains(coordinate.substring(1, 2));
-            } else if("hi".contains(coordinate.substring(0, 1))) {
-                valid = "12".contains(coordinate.substring(1, 2));
-            } else if("j".equals(coordinate.substring(0, 1))) {
-                valid = "1".equals(coordinate.substring(1,2));
+        if(this.value.length() == 2) 
+            if("abcd".contains(this.value.substring(0, 1))) {
+                valid = "1234".contains(this.value.substring(1, 2));
+            } else if("efg".contains(this.value.substring(0, 1))) {
+                valid = "123".contains(this.value.substring(1, 2));
+            } else if("hi".contains(this.value.substring(0, 1))) {
+                valid = "12".contains(this.value.substring(1, 2));
+            } else if("j".equals(this.value.substring(0, 1))) {
+                valid = "1".equals(this.value.substring(1,2));
         }
         if(valid) return true;
         System.out.println("Please enter a valid board coordinate:");
