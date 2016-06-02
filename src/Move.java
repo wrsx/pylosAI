@@ -232,9 +232,9 @@ public class Move {
         return special;
     }
     
-    private static void setSquare(Board gameBoard, Coordinate newCoordinate, int value) {        
-        int[][] level = gameBoard.getLevelTable(newCoordinate.level);    
-        level[newCoordinate.firstIndex][newCoordinate.secondIndex] = value;
-        gameBoard.repaint();
+    private static void setSquare(Board b, Coordinate nc, int value) {        
+        int[][] level = b.getLevelTable(nc.level);    
+        level[nc.firstIndex][nc.secondIndex] = value;
+        b.repaint();
     }         
 }

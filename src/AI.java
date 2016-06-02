@@ -6,12 +6,9 @@ public class AI {
         final static int MAX = 1;
         final static int MIN = -1;
         Board node;
-        Board bestMove;
-        int depth = 4;
+        Board bestBoard;
+
         
-        public AI(Board board) {
-                node = board;
-        }
         /*Returns the score of the best move*/
         public int alphaBeta(Board node, int depth, int a, int b, int player) {
                 if (depth == 0 || node.gameFinished()) {
@@ -40,7 +37,7 @@ public class AI {
         
         private int min(int b, int alphaBeta, Board node, Board child) {
                 if (b > alphaBeta) {
-                        bestMove = child;
+                        bestBoard = child;
                         return alphaBeta;
                 }
                 else {
@@ -50,7 +47,7 @@ public class AI {
         
         private int max(int a, int alphaBeta, Board node, Board child) {
                 if (a > alphaBeta) {
-                        bestMove = child;
+                        bestBoard = child;
                         return alphaBeta;
                 }
                 else {

@@ -9,9 +9,12 @@ import javax.swing.JFrame;
 
 public class Pylos {
     
+    final static int WHITE = 1;
+    final static int BLACK = -1;
     public int currentPlayer;
     public Board gameBoard;
     private final Scanner userInput;
+    private AI player;
     
     public Pylos() {  
         currentPlayer = 1;       
@@ -26,7 +29,9 @@ public class Pylos {
         gameBoard.setLayout(new GridLayout(4,4));
 
         userInput = new Scanner(System.in);
-        test();
+        //test();
+        
+        player = new AI();
     }
     
     public enum Action {
@@ -37,13 +42,18 @@ public class Pylos {
         //continue to allow moves until a player runs out of spheres or reaches the top of the pyramid
         while (!gameBoard.gameFinished()) {   
             System.out.println("\nPlease enter an action: ");
-                try {            
-                    if(move(userInput.next())) {
-                        currentPlayer = -currentPlayer;
-                        if(currentPlayer > 0) {
-                            System.out.println("\nWhite's turn!");
-                        } else System.out.println("\nBlack's turn!");
-                    }  
+                try {
+                    if(currentPlayer == WHITE) {
+                        System.out.println("\nWhite's turn!");
+                        if(move(userInput.next())) {
+                            currentPlayer = -currentPlayer;
+                        }        
+                    } else {
+                        System.out.println("\nBlack's turn!");
+                        AIMove(player);
+                    }
+
+                        
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -51,6 +61,13 @@ public class Pylos {
         }
         winner();
         userInput.close();
+    }
+    
+    private void AIMove(AI p) {
+        p.alphaBeta(gameBoard, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, BLACK);
+        gameBoard.setBoard(p.bestBoard);
+        currentPlayer = -currentPlayer;
+        gameBoard.repaint();
     }
     
     private void winner() {

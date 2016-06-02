@@ -47,6 +47,11 @@ public class Board extends JFrame {
     //Copy constructor
     public Board(Board another) {
         this();
+        setBoard(another);
+
+  }
+
+    public void setBoard(Board another) {
         for(int i = 0; i < another.level0.length; i++) level0[i] = Arrays.copyOf(another.level0[i], another.level0[i].length);
         for(int i = 0; i < another.level1.length; i++) level1[i] = Arrays.copyOf(another.level1[i], another.level1[i].length);
         for(int i = 0; i < another.level2.length; i++) level2[i] = Arrays.copyOf(another.level2[i], another.level2[i].length);
@@ -54,8 +59,8 @@ public class Board extends JFrame {
         
         this.whiteSpheres = another.whiteSpheres;
         this.blackSpheres = another.blackSpheres;
-        this.lastmove = another.lastmove;
-  }    
+        this.lastmove = another.lastmove;        
+    }
     
     //returns the 2D array from the board for that level
     public int[][] getLevelTable(int level) {
@@ -145,15 +150,6 @@ public class Board extends JFrame {
                 
             }
         }
-        for(Board board : possibleBoards) {
-            board.setSize(1500,600); 
-            board.setLocationRelativeTo(null); 
-            board.setBackground(Color.WHITE); 
-            board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-            board.setVisible(true);
-            board.setTitle("Pylos");
-            board.setLayout(new GridLayout(4,4));            
-        }
         enableStdout(true);
         return possibleBoards;
     }
@@ -170,7 +166,7 @@ public class Board extends JFrame {
         }
     }
     
-    private int getBoardScore() {
+    public int getBoardScore() {
         int score = this.whiteSpheres - this.blackSpheres;
         return score;
         
