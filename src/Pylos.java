@@ -132,106 +132,6 @@ public class Pylos {
         }
         return result;
     }
-
-    private static ArrayList<Coordinate> getAllCoordinates(Board b) {
-        ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
-        String characters = "abcdefghij";
-        int x = 0;
-        //loop over the letters and numbers a1 -> j1
-        for(int i = 0; i < characters.length(); i++) {
-            for(int j = 1; j < 5-x; j++) {
-                allCoordinates.add(new Coordinate(characters.substring(i, i+1) + j, b));
-            }
-            //corrects for level 1 being 3x3, level 2 being 2x2....
-            if(i == 3 || i == 6 || i == 8 ) x++;
-        }     
-        return allCoordinates;
-    }
-    
-    private static ArrayList<Move> getValidMoves(Board b, int player) {
-        ArrayList<Move> validMoves = new ArrayList<Move>();
-        ArrayList<Coordinate> allCoordinates = getAllCoordinates(b);
-        //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
-        for(Coordinate nc : allCoordinates) {
-            Move m = new Move(new Board(b), Action.PLACE, player, nc, null);
-            if(Move.checkValidMove(m)) validMoves.add(m);
-        }
-        //loops through all the valid PLACE moves, for each valid place, loop through all coordinates and check if ones on a lower level can be promoted to the new coordinate from the PLACE move
-        int size = validMoves.size();
-        for(int i = 0; i < size; i++) {
-            Coordinate nc = validMoves.get(i).newCoordinate;
-            for(Coordinate oc : allCoordinates) {
-                if(nc.level > oc.level) {
-                    Move m = new Move(new Board(b), Action.PROMOTE, player, nc, oc);
-                        if(Move.checkValidMove(m)) validMoves.add(m);
-                }
-            }
-        }
-        return validMoves;
-    }
-    
-    public static ArrayList<Board> getPossibleBoards(Board b, int player) {
-         //disable stdout to stop all of not valid messages from move
-        enableStdout(false);
-        ArrayList<Board> possibleBoards = new ArrayList<Board>();
-        ArrayList<Move> validMoves = getValidMoves(b, player);
-        ArrayList<Coordinate> allCoordinates = getAllCoordinates(b);
-        
-        int size = validMoves.size();
-        for(int i = 0; i < size; i++) {
-            Move m = validMoves.get(i);
-            m.execute();
-            possibleBoards.add(m.gameBoard);            
-            if(Move.checkSpecialMove(m)) {
-                for(Coordinate oc : allCoordinates) {
-                    Move deleteMove = new Move(new Board(m.gameBoard), Action.REMOVE, player, null, oc);
-                    if(Move.checkValidMove(deleteMove)) {
-                        //delete 1
-                        deleteMove.execute();
-                        possibleBoards.add(deleteMove.gameBoard);
-                        for(Coordinate oc2 : allCoordinates) {
-                            Move deleteMove2 = new Move(new Board(deleteMove.gameBoard), Action.REMOVE, player, null, oc2);
-                            if(Move.checkValidMove(deleteMove2)) {
-                                //delete 2
-                                deleteMove2.execute();
-                                possibleBoards.add(deleteMove2.gameBoard); 
-                            }
-                        }
-                    }
-                }
-                
-            }
-        }
-        for(Board board : possibleBoards) {
-            board.setSize(1500,600); 
-            board.setLocationRelativeTo(null); 
-            board.setBackground(Color.WHITE); 
-            board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-            board.setVisible(true);
-            board.setTitle("Pylos");
-            board.setLayout(new GridLayout(4,4));            
-        }
-        enableStdout(true);
-        return possibleBoards;
-    }
-    
-    private static void enableStdout(Boolean on) {
-        if(on) {
-             System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
-        } else {
-            System.setOut(new PrintStream(new OutputStream() {
-                public void write(int b) {
-                    //DO NOTHING
-                }
-            }));
-        }
-    }
-    
-    private static int getBoardScore(Board b) {
-        int score = b.whiteSpheres - b.blackSpheres;
-        return score;
-        
-    }
     
     void test() {
         gameBoard.level0[2][0] = 1;
@@ -241,7 +141,7 @@ public class Pylos {
         gameBoard.level0[1][1] = -1;
         gameBoard.level0[1][2] = -1;
         gameBoard.level0[1][3] = -1;  
-        getPossibleBoards(gameBoard, -1);
+        gameBoard.getPossibleBoards(-1);
     }
 
     public static void main(String[] args) {

@@ -2,6 +2,11 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JFrame;
@@ -70,6 +75,106 @@ public class Board extends JFrame {
     public boolean gameFinished() {
         return !(whiteSpheres > 0 && blackSpheres > 0 && level3[0][0] == 0);
     }
+    
+    private  ArrayList<Coordinate> getAllCoordinates() {
+        ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
+        String characters = "abcdefghij";
+        int x = 0;
+        //loop over the letters and numbers a1 -> j1
+        for(int i = 0; i < characters.length(); i++) {
+            for(int j = 1; j < 5-x; j++) {
+                allCoordinates.add(new Coordinate(characters.substring(i, i+1) + j, this));
+            }
+            //corrects for level 1 being 3x3, level 2 being 2x2....
+            if(i == 3 || i == 6 || i == 8 ) x++;
+        }     
+        return allCoordinates;
+    }
+    
+    private  ArrayList<Move> getValidMoves(int player) {
+        ArrayList<Move> validMoves = new ArrayList<Move>();
+        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
+        //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
+        for(Coordinate nc : allCoordinates) {
+            Move m = new Move(new Board(this), Pylos.Action.PLACE, player, nc, null);
+            if(Move.checkValidMove(m)) validMoves.add(m);
+        }
+        //loops through all the valid PLACE moves, for each valid place, loop through all coordinates and check if ones on a lower level can be promoted to the new coordinate from the PLACE move
+        int size = validMoves.size();
+        for(int i = 0; i < size; i++) {
+            Coordinate nc = validMoves.get(i).newCoordinate;
+            for(Coordinate oc : allCoordinates) {
+                if(nc.level > oc.level) {
+                    Move m = new Move(new Board(this), Pylos.Action.PROMOTE, player, nc, oc);
+                        if(Move.checkValidMove(m)) validMoves.add(m);
+                }
+            }
+        }
+        return validMoves;
+    }
+    
+    public ArrayList<Board> getPossibleBoards(int player) {
+         //disable stdout to stop all of not valid messages from move
+        enableStdout(false);
+        ArrayList<Board> possibleBoards = new ArrayList<Board>();
+        ArrayList<Move> validMoves = getValidMoves(player);
+        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
+        
+        int size = validMoves.size();
+        for(int i = 0; i < size; i++) {
+            Move m = validMoves.get(i);
+            m.execute();
+            possibleBoards.add(m.gameBoard);            
+            if(Move.checkSpecialMove(m)) {
+                for(Coordinate oc : allCoordinates) {
+                    Move deleteMove = new Move(new Board(m.gameBoard), Pylos.Action.REMOVE, player, null, oc);
+                    if(Move.checkValidMove(deleteMove)) {
+                        //delete 1
+                        deleteMove.execute();
+                        possibleBoards.add(deleteMove.gameBoard);
+                        for(Coordinate oc2 : allCoordinates) {
+                            Move deleteMove2 = new Move(new Board(deleteMove.gameBoard), Pylos.Action.REMOVE, player, null, oc2);
+                            if(Move.checkValidMove(deleteMove2)) {
+                                //delete 2
+                                deleteMove2.execute();
+                                possibleBoards.add(deleteMove2.gameBoard); 
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+        for(Board board : possibleBoards) {
+            board.setSize(1500,600); 
+            board.setLocationRelativeTo(null); 
+            board.setBackground(Color.WHITE); 
+            board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+            board.setVisible(true);
+            board.setTitle("Pylos");
+            board.setLayout(new GridLayout(4,4));            
+        }
+        enableStdout(true);
+        return possibleBoards;
+    }
+    
+    private static void enableStdout(Boolean on) {
+        if(on) {
+             System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+        } else {
+            System.setOut(new PrintStream(new OutputStream() {
+                public void write(int b) {
+                    //DO NOTHING
+                }
+            }));
+        }
+    }
+    
+    private int getBoardScore() {
+        int score = this.whiteSpheres - this.blackSpheres;
+        return score;
+        
+    }    
 
     private void paintLevel(Graphics g, int size, int offset, int[][] level) {
         
