@@ -32,6 +32,7 @@ public class Board extends JFrame {
     public int blackSpheres;
     
     public String lastmove = "";
+    public Board bestBoard;
     
     
     public Board() { //create board and initialise, all initialised to 0
@@ -150,6 +151,16 @@ public class Board extends JFrame {
                 
             }
         }
+        /*
+        for(Board board : possibleBoards) {
+            board.setSize(1500,600); 
+            board.setLocationRelativeTo(null); 
+            board.setBackground(Color.WHITE); 
+            board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+            board.setVisible(true);
+            board.setTitle("Pylos");
+            board.setLayout(new GridLayout(4,4));            
+        }     */
         enableStdout(true);
         return possibleBoards;
     }
@@ -166,12 +177,46 @@ public class Board extends JFrame {
         }
     }
     
-    public int getBoardScore() {
-        int score = this.whiteSpheres - this.blackSpheres;
+    public int getBoardScore(int player) {
+        int score = (this.whiteSpheres - this.blackSpheres) * 30;
+        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
+        
+        int spheresInARow = 0;
+        int[][] levelTable = level0;
+        int length = levelTable.length;
+        //check for two next to each other
+        for(int k = 1; k < length; k++) {
+            for(int i = 0; i < length-k; i++) {
+                for(int j = 0; j < length-k; j++) {
+                    //Check that the current cell is occupied by the current player
+                    if(level0[i][j] == player) {
+                        //Check that the other cells in the square are the current players
+                        if(levelTable[i+k][j] == player && levelTable[i+k][j+k] == player) {
+                            score += player*20;   
+                        } else if(levelTable[i][j+k] == player && levelTable[i+k][j+k] == player) {
+                            score += player*20; 
+                        } else if(levelTable[i][j+k] == player && levelTable[i+k][j] == player) {
+                            score += player*20;          
+                        }
+                        if(levelTable[length-i-k-1][length-j-1] == player && levelTable[length-i-k-1][length-j-k-1] == player) {
+                            score += player*20;   
+                        } else if(levelTable[length-i-1][length-j-k-1] == player && levelTable[length-i-k-1][length-j-k-1] == player) {
+                            score += player*20; 
+                        } else if(levelTable[length-i-1][length-j-k-1] == player && levelTable[length-i-k-1][length-j-1] == player) {
+                            score += player*20;                                        
+                           
+                        } else if(levelTable[i][j+k] == -player) {
+                            score += -player*10;
+                        } else if(levelTable[i+k][j] == -player) {
+                            score += -player*10;
+                        }
+                    }                    
+                    }
+            }
+        }
         return score;
         
-    }    
-
+    } 
     private void paintLevel(Graphics g, int size, int offset, int[][] level) {
         
         //Draw board 
@@ -262,12 +307,17 @@ public class Board extends JFrame {
         g.setColor(Color.WHITE);
         g.fillOval(1330, 350, 100, 100); 
         
+        ///////
+        g.fillRect(540, 450, 50, 50);
+        //////
+        
         g.setColor(Color.BLACK);
         g.fillOval(1330, 470, 100, 100); 
         g.drawOval(1330, 350, 100, 100); 
         
         ///////
-        g.drawString(lastmove, 550, 500);
+        int score = getBoardScore(-1);
+        g.drawString(""+score, 550, 500);
         ///////
         
         g.drawString(Integer.toString(whiteSpheres), 1364, 415);

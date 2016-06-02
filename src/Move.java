@@ -36,17 +36,23 @@ public class Move {
             gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + oldCoordinate.value + " " + newCoordinate.value;
         }
     }
+    
+    private void updateSpheres(int change) {
+        if(player == Pylos.BLACK) {
+            gameBoard.blackSpheres += change;
+        } else gameBoard.whiteSpheres += change;
+        
+    }
         
     public boolean execute() {
         switch(this.action) {
             case PLACE :
-                test();
+                updateSpheres(-1);
                 return place(this);
             case PROMOTE : 
-                test();
                 return promote(this);
             case REMOVE :
-                test();
+                updateSpheres(1);
                 return remove(this);
         }
         return false;        

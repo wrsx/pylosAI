@@ -8,50 +8,30 @@ public class AI {
         Board node;
         Board bestBoard;
 
-        
-        /*Returns the score of the best move*/
-        public int alphaBeta(Board node, int depth, int a, int b, int player) {
-                if (depth == 0 || node.gameFinished()) {
-                        return node.getBoardScore();
-                }                
-                ArrayList<Board> childNodes = node.getPossibleBoards(player);
-                if (player ==  MAX) {
-                            for (int i = 0; i < childNodes.size(); i++) {
-                                    a = max(a, alphaBeta(childNodes.get(i), depth - 1, a, b, -player), node, childNodes.get(i));
-                                    if (b <= a) {
-                                            break;
-                                    }
-                            }
-                            return a;
-                }
-                else {
-                        for (int i = 0; i < childNodes.size(); i++) {
-                                b = min(b, alphaBeta(childNodes.get(i), depth - 1, a, b, -player), node, childNodes.get(i));
-                                if (b <= a) {
-                                        break;
-                                }
-                        }
-                        return b;                                    
-                }               
+
+
+        public Board findBestBoard(int maxDepth, Board root, int player) {
+            root.bestBoard = null;
+            alpha_beta(maxDepth, root, Integer.MIN_VALUE, Integer.MAX_VALUE, player);
+            return root.bestBoard;
         }
-        
-        private int min(int b, int alphaBeta, Board node, Board child) {
-                if (b > alphaBeta) {
-                        bestBoard = child;
-                        return alphaBeta;
+
+        private int alpha_beta(final int depth, Board b, int alpha, int beta, int player) {
+            if (depth == 0) {
+                return b.getBoardScore(player);
+            }
+
+            ArrayList<Board> boards = b.getPossibleBoards(player);
+            for (Board currentBoard: boards) {
+                int score = -alpha_beta(depth - 1, currentBoard, -beta, -alpha, -player);
+                if (alpha < score) {
+                    alpha = score;
+                    b.bestBoard = currentBoard;
                 }
-                else {
-                        return b;
+                if (beta <= alpha) {
+                    return alpha;
                 }
-        }
-        
-        private int max(int a, int alphaBeta, Board node, Board child) {
-                if (a > alphaBeta) {
-                        bestBoard = child;
-                        return alphaBeta;
-                }
-                else {
-                        return a;
-                }
-        }        
+            }
+            return alpha;
+        } 
 }

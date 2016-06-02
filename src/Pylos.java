@@ -64,8 +64,7 @@ public class Pylos {
     }
     
     private void AIMove(AI p) {
-        p.alphaBeta(gameBoard, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, BLACK);
-        gameBoard.setBoard(p.bestBoard);
+        gameBoard.setBoard(player.findBestBoard(4, gameBoard, currentPlayer));
         currentPlayer = -currentPlayer;
         gameBoard.repaint();
     }
