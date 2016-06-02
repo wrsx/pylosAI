@@ -227,6 +227,12 @@ public class Pylos {
         }
     }
     
+    private static int getBoardScore(Board b) {
+        int score = b.whiteSpheres - b.blackSpheres;
+        return score;
+        
+    }
+    
     void test() {
         gameBoard.level0[2][0] = 1;
         gameBoard.level0[2][1] = 1;
