@@ -29,11 +29,11 @@ public class Move {
     
     void test() {
         if(newCoordinate != null && oldCoordinate == null) {
-            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + newCoordinate.value;
+            System.out.println(action + " " + newCoordinate.value);
         } else if(newCoordinate == null && oldCoordinate != null) {
-            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + oldCoordinate.value;
+            System.out.println( action + " " + oldCoordinate.value);
         } else if(newCoordinate != null && oldCoordinate != null) {
-            gameBoard.lastmove = gameBoard.lastmove + " " + action + " " + oldCoordinate.value + " " + newCoordinate.value;
+            System.out.println(action + " " + oldCoordinate.value + " " + newCoordinate.value);
         }
     }
     
@@ -205,8 +205,11 @@ public class Move {
             for(int j = 0; j < levelTable.length-1; j++) {
                 //Check that the current cell is occupied by the current player
                 if(levelTable[i][j] == m.player) {
-                    //Check that our recently placed sphere is within 1 cell of the current sphere
-                    if((i-m.newCoordinate.firstIndex) < 2 && (j-m.newCoordinate.secondIndex) < 2 ) {
+                    //Check that our recently placed sphere is within the current square
+                    if((i == m.newCoordinate.firstIndex) && (j == m.newCoordinate.secondIndex)
+                        || (i+1 == m.newCoordinate.firstIndex) && (j+1 == m.newCoordinate.secondIndex)
+                        || (i+1 == m.newCoordinate.firstIndex) && (j == m.newCoordinate.secondIndex)
+                        || (i == m.newCoordinate.firstIndex) && (j+1 == m.newCoordinate.secondIndex)) {
                         //Check that the other cells in the square are the current players
                         if(levelTable[i+1][j] == m.player && levelTable[i][j+1] == m.player && levelTable[i+1][j+1] == m.player) {
                             System.out.println("Square formed!");

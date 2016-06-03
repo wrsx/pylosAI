@@ -15,6 +15,7 @@ public class Pylos {
     public Board gameBoard;
     private final Scanner userInput;
     private AI player;
+    ArrayList<Coordinate> allCoordinates;
     
     public Pylos() {  
         currentPlayer = 1;       
@@ -27,10 +28,10 @@ public class Pylos {
         gameBoard.setVisible(true);
         gameBoard.setTitle("Pylos");
         gameBoard.setLayout(new GridLayout(4,4));
-
+        
         userInput = new Scanner(System.in);
         //test();
-        
+        //allCoordinates = gameBoard.getAllCoordinates();
         player = new AI();
     }
     
@@ -64,7 +65,10 @@ public class Pylos {
     }
     
     private void AIMove(AI p) {
-        gameBoard.setBoard(player.findBestBoard(4, gameBoard, currentPlayer));
+        //p.count = 0;
+        Board best = p.findBestBoard(4, gameBoard, currentPlayer);
+        gameBoard.setBoard(best);
+
         currentPlayer = -currentPlayer;
         gameBoard.repaint();
     }
@@ -152,12 +156,11 @@ public class Pylos {
     void test() {
         gameBoard.level0[2][0] = 1;
         gameBoard.level0[2][1] = 1;
-        gameBoard.level0[2][2] = 1;
-        gameBoard.level0[2][3] = 1;
-        gameBoard.level0[1][1] = -1;
+        gameBoard.level0[3][0] = 1;
+        //gameBoard.level0[3][1] = 1;
+        gameBoard.level0[0][0] = -1;
         gameBoard.level0[1][2] = -1;
         gameBoard.level0[1][3] = -1;  
-        gameBoard.getPossibleBoards(-1);
     }
 
     public static void main(String[] args) {

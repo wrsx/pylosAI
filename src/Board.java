@@ -33,7 +33,7 @@ public class Board extends JFrame {
     
     public String lastmove = "";
     public Board bestBoard;
-    
+    public int score =0;
     
     public Board() { //create board and initialise, all initialised to 0
         level0 = new int[4][4];
@@ -60,7 +60,7 @@ public class Board extends JFrame {
         
         this.whiteSpheres = another.whiteSpheres;
         this.blackSpheres = another.blackSpheres;
-        this.lastmove = another.lastmove;        
+        this.lastmove = another.lastmove; 
     }
     
     //returns the 2D array from the board for that level
@@ -159,8 +159,9 @@ public class Board extends JFrame {
             board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
             board.setVisible(true);
             board.setTitle("Pylos");
-            board.setLayout(new GridLayout(4,4));            
-        }     */
+            board.setLayout(new GridLayout(4,4));     
+        
+        } */
         enableStdout(true);
         return possibleBoards;
     }
@@ -178,8 +179,36 @@ public class Board extends JFrame {
     }
     
     public int getBoardScore(int player) {
-        int score = (this.whiteSpheres - this.blackSpheres) * 30;
+        //int score = (this.whiteSpheres - this.blackSpheres) * 30;
+        int score = player*this.blackSpheres*50;
+        
+        int[][] levelTable = level0;
+        int length = levelTable.length;
+        for(int i = 0; i < length-1; i++) {
+            for(int j = 0; j < length-1; j++) { 
+                if(levelTable[i][j] == player ) {
+                    if(levelTable[i+1][j] == player) score += 20*player;
+                    if(levelTable[i][j+1] == player) score += 20*player;
+                }
+                if(levelTable[i+1][j+1] == player ) {
+                    if(levelTable[i+1][j] == player) score += 20*player;
+                    if(levelTable[i][j+1] == player) score += 20*player;
+                }      
+                if(levelTable[i+1][j] == player ) {
+                    if(levelTable[i+1][j+1] == player) score += 20*player;
+                    if(levelTable[i][j+1] == player) score += 20*player;
+                } 
+                if(levelTable[i][j+1] == player ) {
+                    if(levelTable[i+1][j+1] == player) score += 20*player;
+                    if(levelTable[i+1][j] == player) score += 20*player;
+                }                 
+                    
+            }       
+        }
+        
+        /*
         ArrayList<Coordinate> allCoordinates = getAllCoordinates();
+        
         
         int spheresInARow = 0;
         int[][] levelTable = level0;
@@ -210,10 +239,11 @@ public class Board extends JFrame {
                         } else if(levelTable[i+k][j] == -player) {
                             score += -player*10;
                         }
-                    }                    
+                
                     }
             }
         }
+        } */
         return score;
         
     } 
@@ -308,7 +338,7 @@ public class Board extends JFrame {
         g.fillOval(1330, 350, 100, 100); 
         
         ///////
-        g.fillRect(540, 450, 50, 50);
+        g.fillRect(540, 450, 100, 50);
         //////
         
         g.setColor(Color.BLACK);
@@ -316,7 +346,7 @@ public class Board extends JFrame {
         g.drawOval(1330, 350, 100, 100); 
         
         ///////
-        int score = getBoardScore(-1);
+        //int score = getBoardScore(-1);
         g.drawString(""+score, 550, 500);
         ///////
         
