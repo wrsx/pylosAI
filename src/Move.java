@@ -18,6 +18,7 @@ public class Move {
     public int player;
     public Coordinate newCoordinate = null;
     public Coordinate oldCoordinate = null;
+    public int score = 0;
     
     Move(Board b, Pylos.Action a, int p, Coordinate nc, Coordinate oc) {
         gameBoard = b;
@@ -44,7 +45,8 @@ public class Move {
         
     }
         
-    public boolean execute() {
+    public boolean execute(Board b) {
+        gameBoard = b;
         switch(this.action) {
             case PLACE :
                 updateSpheres(-1);

@@ -27,12 +27,14 @@ public class Board extends JFrame {
     public int[][] level1;
     public int[][] level2;
     public int[][] level3;
+    private final ArrayList<Coordinate> allCoordinates;
     
     public int whiteSpheres;
     public int blackSpheres;
     
     public String lastmove = "";
-    public Board bestBoard;
+    public Move[] bestMoveSet;
+    
     public int score =0;
     
     public Board() { //create board and initialise, all initialised to 0
@@ -42,12 +44,17 @@ public class Board extends JFrame {
         level3 = new int[1][1];
         
         whiteSpheres = 15;
-        blackSpheres = 15;        
+        blackSpheres = 15;     
+        allCoordinates = getAllCoordinates();
     }
     
     //Copy constructor
     public Board(Board another) {
-        this();
+        level0 = new int[4][4];
+        level1 = new int[3][3];
+        level2 = new int[2][2];
+        level3 = new int[1][1];
+        allCoordinates = another.allCoordinates;
         setBoard(another);
 
   }
@@ -83,23 +90,96 @@ public class Board extends JFrame {
     }
     
     private  ArrayList<Coordinate> getAllCoordinates() {
-        ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
+        ArrayList<Coordinate> all = new ArrayList<Coordinate>();
         String characters = "abcdefghij";
         int x = 0;
         //loop over the letters and numbers a1 -> j1
         for(int i = 0; i < characters.length(); i++) {
             for(int j = 1; j < 5-x; j++) {
-                allCoordinates.add(new Coordinate(characters.substring(i, i+1) + j, this));
+                all.add(new Coordinate(characters.substring(i, i+1) + j, this));
             }
             //corrects for level 1 being 3x3, level 2 being 2x2....
             if(i == 3 || i == 6 || i == 8 ) x++;
         }     
-        return allCoordinates;
+        return all;
+    }
+    
+    public ArrayList<Move[]> getValidMoveSets(int player) {
+        enableStdout(false);
+        ArrayList<Move[]> validMoveSets = new ArrayList<Move[]>();
+        //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
+        for(Coordinate nc : allCoordinates) {
+            Move m = new Move(new Board(this), Pylos.Action.PLACE, player, nc, null);
+            if(Move.checkValidMove(m)) {
+                Move[] moveSet = new Move[3];
+                moveSet[0] = m;
+                validMoveSets.add(moveSet);                
+                if(Move.checkSpecialMove(m)) {
+                    addDeleteMoveSets(moveSet, validMoveSets, player);
+                }
+
+                
+            }
+        }
+        //loops through all the valid PLACE moves, for each valid place, loop through all coordinates and check if ones on a lower level can be promoted to the new coordinate from the PLACE move
+        int size = validMoveSets.size();
+        for(int i = 0; i < size; i++) {
+            Move[] ms = validMoveSets.get(i);
+            if(ms[1] == null && ms[2] == null) {
+                Coordinate nc = validMoveSets.get(i)[0].newCoordinate;
+                for(Coordinate oc : allCoordinates) {
+                    if(nc.level > oc.level) {
+                        Move m = new Move(new Board(this), Pylos.Action.PROMOTE, player, nc, oc);
+                        if(Move.checkValidMove(m)) {
+                            Move[] moveSet = new Move[3];
+                            moveSet[0] = m;
+                            validMoveSets.add(moveSet);
+                            if(Move.checkSpecialMove(m)) {
+                                addDeleteMoveSets(moveSet, validMoveSets, player);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        enableStdout(true);
+        return validMoveSets;
+    }
+    
+    public void addDeleteMoveSets(Move[] moveSet, ArrayList<Move[]> validMoveSets, int player) {
+        //Execute the move on the board so we can check what delete moves are ok        
+        moveSet[0].execute(moveSet[0].gameBoard);
+        for(Coordinate oc : allCoordinates) {
+            Move deleteMove = new Move(new Board(moveSet[0].gameBoard), Pylos.Action.REMOVE, player, null, oc);
+            if(Move.checkValidMove(deleteMove)) {
+                //delete 1
+                moveSet[1] = deleteMove;
+                moveSet[1].execute(moveSet[1].gameBoard);
+                moveSet[2] = null;
+                validMoveSets.add(moveSet);
+                for(Coordinate oc2 : allCoordinates) {
+                    Move deleteMove2 = new Move(new Board(moveSet[1].gameBoard), Pylos.Action.REMOVE, player, null, oc2);
+                    if(Move.checkValidMove(deleteMove2)) {
+                        //delete 2
+                        moveSet[2] = deleteMove2;
+                        validMoveSets.add(moveSet);
+                    }
+                }
+            }
+        }        
+    }
+    
+    void executeMoveSet(Move[] moveSet) {
+        moveSet[0].execute(this);
+        //moveSet[0].execute(new Board(gameBoard));
+        if(moveSet[1] != null) {
+            moveSet[1].execute(this);//execute(b);
+            if(moveSet[2] != null) moveSet[2].execute(this);//execute(b);
+        }        
     }
     
     private  ArrayList<Move> getValidMoves(int player) {
         ArrayList<Move> validMoves = new ArrayList<Move>();
-        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
         //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
         for(Coordinate nc : allCoordinates) {
             Move m = new Move(new Board(this), Pylos.Action.PLACE, player, nc, null);
@@ -117,32 +197,31 @@ public class Board extends JFrame {
             }
         }
         return validMoves;
-    }
+    }    
     
     public ArrayList<Board> getPossibleBoards(int player) {
          //disable stdout to stop all of not valid messages from move
         enableStdout(false);
         ArrayList<Board> possibleBoards = new ArrayList<Board>();
         ArrayList<Move> validMoves = getValidMoves(player);
-        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
-        
+
         int size = validMoves.size();
         for(int i = 0; i < size; i++) {
             Move m = validMoves.get(i);
-            m.execute();
+            m.execute(m.gameBoard);
             possibleBoards.add(m.gameBoard);            
             if(Move.checkSpecialMove(m)) {
                 for(Coordinate oc : allCoordinates) {
                     Move deleteMove = new Move(new Board(m.gameBoard), Pylos.Action.REMOVE, player, null, oc);
                     if(Move.checkValidMove(deleteMove)) {
                         //delete 1
-                        deleteMove.execute();
+                        deleteMove.execute(deleteMove.gameBoard);
                         possibleBoards.add(deleteMove.gameBoard);
                         for(Coordinate oc2 : allCoordinates) {
                             Move deleteMove2 = new Move(new Board(deleteMove.gameBoard), Pylos.Action.REMOVE, player, null, oc2);
                             if(Move.checkValidMove(deleteMove2)) {
                                 //delete 2
-                                deleteMove2.execute();
+                                deleteMove2.execute(deleteMove2.gameBoard);
                                 possibleBoards.add(deleteMove2.gameBoard); 
                             }
                         }
@@ -165,8 +244,11 @@ public class Board extends JFrame {
         enableStdout(true);
         return possibleBoards;
     }
+
     
-    private static void enableStdout(Boolean on) {
+    
+    
+    public static void enableStdout(Boolean on) {
         if(on) {
              System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
         } else {
@@ -180,8 +262,40 @@ public class Board extends JFrame {
     
     public int getBoardScore(int player) {
         //int score = (this.whiteSpheres - this.blackSpheres) * 30;
-        int score = player*this.blackSpheres*50;
+        int score = 0;
+        score = (whiteSpheres-blackSpheres)*100;
         
+        
+        
+  
+        for(int k = 0; k < 4; k++) {
+            int[][] levelTable = getLevelTable(k);
+            int length = levelTable.length;
+            //encoruage building lines
+            for(int i = 0; i < length; i++) {
+                int vcount = 0;
+                for(int j = 0; j < length; j++) {
+                    if(levelTable[i][j] == player) {
+                        vcount++;
+                    } else if(levelTable[i][j] == -player){
+                        vcount = 0;
+                        break;
+                    }
+                }
+                score += vcount*20;
+                for(int j = 0; j < length; j++) {
+                    if(levelTable[j][i] == player) {
+                        vcount++;
+                    } else if(levelTable[i][j] == -player) {
+                        vcount = 0;
+                        break;
+                    }
+                }
+                score += vcount*20;
+            }
+        }
+        
+        /*
         int[][] levelTable = level0;
         int length = levelTable.length;
         for(int i = 0; i < length-1; i++) {
@@ -205,7 +319,7 @@ public class Board extends JFrame {
                     
             }       
         }
-        
+        */
         /*
         ArrayList<Coordinate> allCoordinates = getAllCoordinates();
         
@@ -347,7 +461,7 @@ public class Board extends JFrame {
         
         ///////
         //int score = getBoardScore(-1);
-        g.drawString(""+score, 550, 500);
+        g.drawString(""+getBoardScore(-1), 550, 500);
         ///////
         
         g.drawString(Integer.toString(whiteSpheres), 1364, 415);
