@@ -32,9 +32,6 @@ public class Board extends JFrame {
     public int whiteSpheres;
     public int blackSpheres;
     
-    public String lastmove = "";
-    public Move[] bestMoveSet;
-    
     public int score =0;
     
     public Board() { //create board and initialise, all initialised to 0
@@ -67,7 +64,6 @@ public class Board extends JFrame {
         
         this.whiteSpheres = another.whiteSpheres;
         this.blackSpheres = another.blackSpheres;
-        this.lastmove = another.lastmove; 
     }
     
     //returns the 2D array from the board for that level
@@ -103,81 +99,7 @@ public class Board extends JFrame {
         }     
         return all;
     }
-    
-    public ArrayList<Move[]> getValidMoveSets(int player) {
-        enableStdout(false);
-        ArrayList<Move[]> validMoveSets = new ArrayList<Move[]>();
-        //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
-        for(Coordinate nc : allCoordinates) {
-            Move m = new Move(new Board(this), Pylos.Action.PLACE, player, nc, null);
-            if(Move.checkValidMove(m)) {
-                Move[] moveSet = new Move[3];
-                moveSet[0] = m;
-                validMoveSets.add(moveSet);                
-                if(Move.checkSpecialMove(m)) {
-                    addDeleteMoveSets(moveSet, validMoveSets, player);
-                }
 
-                
-            }
-        }
-        //loops through all the valid PLACE moves, for each valid place, loop through all coordinates and check if ones on a lower level can be promoted to the new coordinate from the PLACE move
-        int size = validMoveSets.size();
-        for(int i = 0; i < size; i++) {
-            Move[] ms = validMoveSets.get(i);
-            if(ms[1] == null && ms[2] == null) {
-                Coordinate nc = validMoveSets.get(i)[0].newCoordinate;
-                for(Coordinate oc : allCoordinates) {
-                    if(nc.level > oc.level) {
-                        Move m = new Move(new Board(this), Pylos.Action.PROMOTE, player, nc, oc);
-                        if(Move.checkValidMove(m)) {
-                            Move[] moveSet = new Move[3];
-                            moveSet[0] = m;
-                            validMoveSets.add(moveSet);
-                            if(Move.checkSpecialMove(m)) {
-                                addDeleteMoveSets(moveSet, validMoveSets, player);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        enableStdout(true);
-        return validMoveSets;
-    }
-    
-    public void addDeleteMoveSets(Move[] moveSet, ArrayList<Move[]> validMoveSets, int player) {
-        //Execute the move on the board so we can check what delete moves are ok        
-        moveSet[0].execute(moveSet[0].gameBoard);
-        for(Coordinate oc : allCoordinates) {
-            Move deleteMove = new Move(new Board(moveSet[0].gameBoard), Pylos.Action.REMOVE, player, null, oc);
-            if(Move.checkValidMove(deleteMove)) {
-                //delete 1
-                moveSet[1] = deleteMove;
-                moveSet[1].execute(moveSet[1].gameBoard);
-                moveSet[2] = null;
-                validMoveSets.add(moveSet);
-                for(Coordinate oc2 : allCoordinates) {
-                    Move deleteMove2 = new Move(new Board(moveSet[1].gameBoard), Pylos.Action.REMOVE, player, null, oc2);
-                    if(Move.checkValidMove(deleteMove2)) {
-                        //delete 2
-                        moveSet[2] = deleteMove2;
-                        validMoveSets.add(moveSet);
-                    }
-                }
-            }
-        }        
-    }
-    
-    void executeMoveSet(Move[] moveSet) {
-        moveSet[0].execute(this);
-        //moveSet[0].execute(new Board(gameBoard));
-        if(moveSet[1] != null) {
-            moveSet[1].execute(this);//execute(b);
-            if(moveSet[2] != null) moveSet[2].execute(this);//execute(b);
-        }        
-    }
-    
     private  ArrayList<Move> getValidMoves(int player) {
         ArrayList<Move> validMoves = new ArrayList<Move>();
         //loops through all of the coordinates and checks if a new sphere can be added, it it can it is added as a valid move
@@ -230,17 +152,6 @@ public class Board extends JFrame {
                 
             }
         }
-        /*
-        for(Board board : possibleBoards) {
-            board.setSize(1500,600); 
-            board.setLocationRelativeTo(null); 
-            board.setBackground(Color.WHITE); 
-            board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-            board.setVisible(true);
-            board.setTitle("Pylos");
-            board.setLayout(new GridLayout(4,4));     
-        
-        } */
         enableStdout(true);
         return possibleBoards;
     }
@@ -265,9 +176,7 @@ public class Board extends JFrame {
         int score = 0;
         score = (whiteSpheres-blackSpheres)*100;
         
-        
-        
-  
+
         for(int k = 0; k < 4; k++) {
             int[][] levelTable = getLevelTable(k);
             int length = levelTable.length;
@@ -294,73 +203,9 @@ public class Board extends JFrame {
                 score += vcount*20;
             }
         }
-        
-        /*
-        int[][] levelTable = level0;
-        int length = levelTable.length;
-        for(int i = 0; i < length-1; i++) {
-            for(int j = 0; j < length-1; j++) { 
-                if(levelTable[i][j] == player ) {
-                    if(levelTable[i+1][j] == player) score += 20*player;
-                    if(levelTable[i][j+1] == player) score += 20*player;
-                }
-                if(levelTable[i+1][j+1] == player ) {
-                    if(levelTable[i+1][j] == player) score += 20*player;
-                    if(levelTable[i][j+1] == player) score += 20*player;
-                }      
-                if(levelTable[i+1][j] == player ) {
-                    if(levelTable[i+1][j+1] == player) score += 20*player;
-                    if(levelTable[i][j+1] == player) score += 20*player;
-                } 
-                if(levelTable[i][j+1] == player ) {
-                    if(levelTable[i+1][j+1] == player) score += 20*player;
-                    if(levelTable[i+1][j] == player) score += 20*player;
-                }                 
-                    
-            }       
-        }
-        */
-        /*
-        ArrayList<Coordinate> allCoordinates = getAllCoordinates();
-        
-        
-        int spheresInARow = 0;
-        int[][] levelTable = level0;
-        int length = levelTable.length;
-        //check for two next to each other
-        for(int k = 1; k < length; k++) {
-            for(int i = 0; i < length-k; i++) {
-                for(int j = 0; j < length-k; j++) {
-                    //Check that the current cell is occupied by the current player
-                    if(level0[i][j] == player) {
-                        //Check that the other cells in the square are the current players
-                        if(levelTable[i+k][j] == player && levelTable[i+k][j+k] == player) {
-                            score += player*20;   
-                        } else if(levelTable[i][j+k] == player && levelTable[i+k][j+k] == player) {
-                            score += player*20; 
-                        } else if(levelTable[i][j+k] == player && levelTable[i+k][j] == player) {
-                            score += player*20;          
-                        }
-                        if(levelTable[length-i-k-1][length-j-1] == player && levelTable[length-i-k-1][length-j-k-1] == player) {
-                            score += player*20;   
-                        } else if(levelTable[length-i-1][length-j-k-1] == player && levelTable[length-i-k-1][length-j-k-1] == player) {
-                            score += player*20; 
-                        } else if(levelTable[length-i-1][length-j-k-1] == player && levelTable[length-i-k-1][length-j-1] == player) {
-                            score += player*20;                                        
-                           
-                        } else if(levelTable[i][j+k] == -player) {
-                            score += -player*10;
-                        } else if(levelTable[i+k][j] == -player) {
-                            score += -player*10;
-                        }
-                
-                    }
-            }
-        }
-        } */
-        return score;
-        
+        return score;  
     } 
+    
     private void paintLevel(Graphics g, int size, int offset, int[][] level) {
         
         //Draw board 
@@ -451,18 +296,9 @@ public class Board extends JFrame {
         g.setColor(Color.WHITE);
         g.fillOval(1330, 350, 100, 100); 
         
-        ///////
-        g.fillRect(540, 450, 100, 50);
-        //////
-        
         g.setColor(Color.BLACK);
         g.fillOval(1330, 470, 100, 100); 
         g.drawOval(1330, 350, 100, 100); 
-        
-        ///////
-        //int score = getBoardScore(-1);
-        g.drawString(""+getBoardScore(-1), 550, 500);
-        ///////
         
         g.drawString(Integer.toString(whiteSpheres), 1364, 415);
         g.setColor(Color.WHITE);

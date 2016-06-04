@@ -1,9 +1,5 @@
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.*;
 import javax.swing.JFrame;
 
@@ -15,7 +11,6 @@ public class Pylos {
     public Board gameBoard;
     private final Scanner userInput;
     private AI player;
-    ArrayList<Coordinate> allCoordinates;
     
     public Pylos() {  
         currentPlayer = 1;       
@@ -30,8 +25,6 @@ public class Pylos {
         gameBoard.setLayout(new GridLayout(4,4));
         
         userInput = new Scanner(System.in);
-        //test2();
-        //allCoordinates = gameBoard.getAllCoordinates();
         player = new AI();
     }
     
@@ -51,11 +44,6 @@ public class Pylos {
                         }        
                     } else {
                         System.out.println("\nBlack's turn!");
-                                //printPossibleMoves();
-                                /*
-                        if(move(userInput.next())) {
-                            currentPlayer = -currentPlayer;
-                        }*/
                         AIMove(player);
                     }
 
@@ -71,9 +59,6 @@ public class Pylos {
     
     private void AIMove(AI p) {
         Board.enableStdout(false);
-        //p.count = 0;
-        //Move[] best = p.findBestMoveSet(3, gameBoard, currentPlayer);
-        //gameBoard.executeMoveSet(best);
         gameBoard.setBoard(p.bestBoard(gameBoard, 3, currentPlayer));
         currentPlayer = -currentPlayer;
         gameBoard.repaint();
@@ -158,50 +143,6 @@ public class Pylos {
             }
         }
         return result;
-    }
-    
-    void test() {
-        gameBoard.level0[2][0] = 1;
-        gameBoard.level0[2][1] = 1;
-        gameBoard.level0[3][0] = 1;
-        //gameBoard.level0[3][1] = 1;
-        gameBoard.level0[0][0] = -1;
-        gameBoard.level0[1][2] = -1;
-        gameBoard.level0[1][3] = -1;  
-    }
-    void test2() {
-        gameBoard.level0[1][2] = -1;
-        gameBoard.level0[2][2] = -1;
-        gameBoard.level0[2][3] = -1;
-        gameBoard.level0[0][0] = -1;
-        gameBoard.level0[1][0] = 1;
-        gameBoard.level0[2][0] = 1;
-        gameBoard.level0[3][0] = 1;  
-    }    
-    
-    void printPossibleMoves() {
-        Board.enableStdout(false);
-        ArrayList<Move[]> moveList = gameBoard.getValidMoveSets(BLACK);
-        for(Move[] moveSet : moveList) {
-            Board b = new Board(gameBoard);
-            //moveSet[0].test();
-            moveSet[0].execute(b);
-            if(moveSet[1] != null) {
-                moveSet[1].execute(b);
-                if(moveSet[2] != null) moveSet[2].execute(b);
-            }
-            System.out.println("");
-            b.repaint();
-            b.setSize(1500,600); 
-            b.setLocationRelativeTo(null); 
-            b.setBackground(Color.WHITE); 
-            b.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-            b.setVisible(true);
-            b.setTitle("Pylos");
-            b.setLayout(new GridLayout(4,4));  
-
-        }
-        Board.enableStdout(true);
     }
 
     public static void main(String[] args) {

@@ -18,7 +18,6 @@ public class Move {
     public int player;
     public Coordinate newCoordinate = null;
     public Coordinate oldCoordinate = null;
-    public int score = 0;
     
     Move(Board b, Pylos.Action a, int p, Coordinate nc, Coordinate oc) {
         gameBoard = b;
